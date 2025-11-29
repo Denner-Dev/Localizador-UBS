@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noEmit": true,
+    "jsx": "preserve"
+  },
+  "extends": "expo/tsconfig.base"
+}

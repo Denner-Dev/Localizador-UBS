@@ -1,0 +1,51 @@
+# Backend (.NET)
+backend/Api/bin/
+backend/Api/obj/
+backend/Api/app.db
+backend/Api/app.db-shm
+backend/Api/app.db-wal
+*.user
+*.suo
+*.cache
+*.log
+
+# Frontend (React Native/Expo)
+frontend/node_modules/
+frontend/.expo/
+frontend/dist/
+frontend/*.tgz
+frontend/*.tar.gz
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.temp
