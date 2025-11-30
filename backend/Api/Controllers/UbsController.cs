@@ -15,6 +15,7 @@ namespace Api.Controllers
             _service = service;
         }
 
+
         [Authorize]
         [HttpGet("perto")]
         public IActionResult GetPerto([FromQuery] double lat, [FromQuery] double lng)

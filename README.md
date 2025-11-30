@@ -1,13 +1,14 @@
 # 🏥 UBS Locator - Teste Técnico Fullstack
 
-> **Aplicação para localização de Unidades Básicas de Saúde (UBS) próximas**
+> **Aplicação para localização de Unidades Básicas de Saúde (UBS) próximas baseada na localização do usuário**
 
 ## 📋 O que é este projeto?
 
 Este é um aplicativo mobile que permite:
-- **Cadastrar usuários** com nome, email e senha
-- **Fazer login** de forma segura
-- **Ver lista de UBS** (postos de saúde) próximas
+- **Cadastrar usuários** com dados pessoais e localização
+- **Fazer login** de forma segura com validações
+- **Ver lista de 50 UBS reais** de São Paulo ordenadas por proximidade
+- **Calcular distância** das UBS até sua localização
 - **Sair do aplicativo** com segurança
 
 ## 🛠️ GUIA COMPLETO DE INSTALAÇÃO (Passo a Passo)
@@ -16,19 +17,28 @@ Este é um aplicativo mobile que permite:
 
 **Você precisa instalar estes programas no seu computador:**
 
-#### 1. Instalar .NET 9.0
+#### 1. Instalar Visual Studio Code
+1. Acesse: https://code.visualstudio.com
+2. Baixe o **VS Code** para Windows
+3. Execute o instalador
+4. Instale as extensões recomendadas:
+   - C# Dev Kit
+   - React Native Tools
+   - ES7+ React/Redux/React-Native snippets
+
+#### 2. Instalar .NET 9.0
 1. Acesse: https://dotnet.microsoft.com/download
 2. Baixe o **.NET 9.0 SDK**
 3. Execute o instalador
 4. Reinicie o computador
 
-#### 2. Instalar Node.js
+#### 3. Instalar Node.js
 1. Acesse: https://nodejs.org
 2. Baixe a versão **LTS** (recomendada)
 3. Execute o instalador
 4. Reinicie o computador
 
-#### 3. Verificar se instalou corretamente
+#### 4. Verificar se instalou corretamente
 Abra o **Prompt de Comando** (cmd) e digite:
 ```bash
 dotnet --version
@@ -118,13 +128,15 @@ npm --version
 ### 1. Primeira vez usando:
 1. **Clique em "Não tem conta? Cadastre-se"**
 2. **Preencha os dados:**
-   - Nome: Seu nome
-   - Email: seu@email.com
-   - Senha: 123456
+   - Nome Completo: Seu nome completo
+   - Email: seu@email.com (máximo 50 caracteres)
+   - Senha: 123456 (entre 6 e 100 caracteres)
    - CEP: 01234-567
    - Endereço: Rua Exemplo, 123
-   - Latitude: -23.55052
-   - Longitude: -46.63331
+   - **Latitude: SUA latitude real** (ex: -23.55052)
+   - **Longitude: SUA longitude real** (ex: -46.63331)
+   
+   **💡 IMPORTANTE:** Use suas coordenadas reais para ver as UBS mais próximas de você!
 3. **Clique em "Cadastrar"**
 4. **Se aparecer "Cadastro realizado com sucesso!", deu certo!**
 
@@ -134,8 +146,9 @@ npm --version
 3. **Você verá a lista de UBS próximas**
 
 ### 3. Vendo as UBS:
-- Aparecerá uma lista com 5 postos de saúde
-- Cada um mostra: nome, endereço e distância
+- Aparecerá uma lista com **50 UBS reais** de São Paulo
+- Ordenadas por **distância da sua localização**
+- Cada uma mostra: nome, endereço completo e distância em km
 - Para sair, clique no botão **"Sair"** no canto superior direito
 
 ---
@@ -186,15 +199,17 @@ projeto_fullstack/
 
 ## 🌐 Como funciona?
 
-1. **Backend (Servidor):** Roda na porta 5000, gerencia usuários e UBS
-2. **Frontend (App):** Se conecta ao servidor para buscar dados
-3. **Banco de dados:** Arquivo SQLite que guarda os usuários cadastrados
+1. **Backend (Servidor):** Roda na porta 5000, gerencia usuários e 50 UBS reais
+2. **Frontend (App):** Se conecta ao servidor e calcula distâncias
+3. **Banco de dados:** SQLite que guarda usuários com suas coordenadas
+4. **Algoritmo:** Calcula distância real usando fórmula de Haversine
+5. **Localização:** Usa SUA localização para ordenar UBS por proximidade
 
 ## 📱 Telas do Aplicativo
 
-1. **🔐 Login** - Digite email e senha para entrar
-2. **📝 Cadastro** - Registre-se se não tem conta
-3. **🏥 UBS** - Veja lista de postos de saúde próximos
+1. **🔐 Login** - Email e senha com validações obrigatórias
+2. **📝 Cadastro** - Registro completo com localização
+3. **🏥 UBS** - Lista de 50 UBS reais ordenadas por distância da sua casa
 
 ## 🔒 Segurança
 
@@ -205,11 +220,19 @@ projeto_fullstack/
 ## 📋 Tecnologias Usadas
 
 **Backend (Servidor):**
-- ASP.NET Core 9.0 
-- SQLite 
-- JWT 
+- ASP.NET Core 9.0 com Entity Framework
+- SQLite para banco de dados
+- JWT para autenticação segura
+- BCrypt para criptografia de senhas
+- Validações com Data Annotations
 
 **Frontend (Aplicativo):**
-- React Native 
-- Expo 
-- Axios (Para conectar com servidor)
+- React Native com Expo
+- Axios para comunicação HTTP
+- AsyncStorage para tokens
+- Validações de formulário
+
+**Ferramentas de Desenvolvimento:**
+- Visual Studio Code
+- Expo CLI
+- .NET CLI

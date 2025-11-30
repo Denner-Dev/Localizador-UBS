@@ -16,29 +16,22 @@ export default function UbsListScreen({ navigation }) {
   useEffect(() => {
     const fetchUbs = async () => {
       try {
-        // Verificar se o token existe
+        // Verificar autenticação
         const token = await AsyncStorage.getItem("token");
-        console.log("Token found:", token ? "Yes" : "No");
-        
         if (!token) {
           Alert.alert("Erro", "Token não encontrado. Faça login novamente");
           setLoading(false);
           return;
         }
         
-        // Usando coordenadas fixas de São Paulo para teste
-        const lat = -23.55052;
-        const lng = -46.63331;
+        // Buscar coordenadas do usuário logado
+        const userResponse = await api.get("/auth/me");
+        const { latitude, longitude } = userResponse.data;
         
-        console.log("Fetching UBS with coordinates:", lat, lng);
-        const res = await api.get(`/ubs/perto?lat=${lat}&lng=${lng}`);
-        console.log("UBS response:", res.data);
+        // Buscar UBS ordenadas por proximidade
+        const res = await api.get(`/ubs/perto?lat=${latitude}&lng=${longitude}`);
         setUbs(res.data);
       } catch (error) {
-        console.log("Error details:", error);
-        console.log("Error response:", error.response?.data);
-        console.log("Error message:", error.message);
-        console.log("Error status:", error.response?.status);
         Alert.alert("Erro", "Não foi possível buscar as UBSs próximas");
       } finally {
         setLoading(false);

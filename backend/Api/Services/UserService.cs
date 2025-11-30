@@ -17,12 +17,15 @@ namespace Api.Services
             _jwt = jwt;
         }
 
+        /// Registra um novo usuário no sistema
         public async Task<User> Register(UserCreateDto dto)
         {
+            // Verifica se email já existe
             var existingUser = await _repo.GetByEmail(dto.Email);
             if (existingUser != null)
                 throw new Exception("Email já está em uso");
 
+            // Criptografa a senha usando BCrypt
             var hash = BCrypt.Net.BCrypt.HashPassword(dto.Senha);
 
             var user = new User
@@ -32,7 +35,7 @@ namespace Api.Services
                 SenhaHash = hash,
                 Cep = dto.Cep ?? "",
                 Endereco = dto.Endereco ?? "",
-                Latitude = dto.Latitude,
+                Latitude = dto.Latitude, 
                 Longitude = dto.Longitude
             };
 
@@ -40,15 +43,25 @@ namespace Api.Services
             return user;
         }
 
+        /// Autentica usuário e gera token JWT
         public async Task<string> Login(LoginDto dto)
         {
             var user = await _repo.GetByEmail(dto.Email);
             if (user == null) return null;
 
+            // Verifica senha usando BCrypt
             if (!BCrypt.Net.BCrypt.Verify(dto.Senha, user.SenhaHash))
                 return null;
 
+            // Gera token JWT para autenticação
             return _jwt.GenerateToken(user);
+        }
+
+
+        /// Busca usuário por email (usado para obter coordenadas)
+        public async Task<User> GetUserByEmail(string email)
+        {
+            return await _repo.GetByEmail(email);
         }
     }
 }

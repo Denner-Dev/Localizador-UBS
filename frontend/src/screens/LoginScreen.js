@@ -8,24 +8,34 @@ export default function LoginScreen({ navigation }) {
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Função para processar o login do usuário
   const handleLogin = async () => {
-    if (!email || !senha) {
-      Alert.alert("Erro", "Preencha email e senha");
+    const errors = [];
+    
+    // Validação de campos obrigatórios
+    if (!email) errors.push("Email");
+    if (!senha || senha.length < 6) errors.push("Senha (mínimo 6 caracteres)");
+    
+    if (errors.length > 0) {
+      Alert.alert(
+        "Campos obrigatórios não preenchidos", 
+        "Preencha os seguintes campos:\n\n• " + errors.join("\n• ")
+      );
       return;
     }
 
     setLoading(true);
     try {
+      // Autentica no backend
       const response = await api.post("/auth/login", { email, senha });
       const token = response.data.token;
 
-      // Salva o token no AsyncStorage
+      // Salva token JWT para autenticação
       await AsyncStorage.setItem("token", token);
 
-      // Navega para tela de UBS (replace para não voltar)
+      // Navega para tela principal (replace impede voltar)
       navigation.replace("UBSScreen");
     } catch (error) {
-      console.log(error.response?.data || error.message);
       Alert.alert("Erro", "Email ou senha inválidos");
     } finally {
       setLoading(false);
@@ -36,19 +46,21 @@ export default function LoginScreen({ navigation }) {
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
       <TextInput
-        placeholder="Email"
+        placeholder="Email *"
         value={email}
         onChangeText={setEmail}
         style={styles.input}
         autoCapitalize="none"
         keyboardType="email-address"
+        maxLength={50}
       />
       <TextInput
-        placeholder="Senha"
+        placeholder="Senha *"
         value={senha}
         onChangeText={setSenha}
         style={styles.input}
         secureTextEntry
+        maxLength={100}
       />
       <Button title={loading ? "Carregando..." : "Entrar"} onPress={handleLogin} disabled={loading} />
       <Text
