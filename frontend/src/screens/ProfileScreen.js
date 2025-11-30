@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../services/api";
+import showAlert, { showConfirm } from "../utils/alert";
 
 export default function ProfileScreen({ navigation }) {
   const [user, setUser] = useState(null);
@@ -13,7 +14,7 @@ export default function ProfileScreen({ navigation }) {
         const response = await api.get("/auth/me");
         setUser(response.data);
       } catch (error) {
-        Alert.alert("Erro", "Não foi possível carregar os dados do perfil");
+        showAlert("Erro", "Não foi possível carregar os dados do perfil", "Erro");
       } finally {
         setLoading(false);
       }
@@ -27,44 +28,36 @@ export default function ProfileScreen({ navigation }) {
   }, [navigation]);
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem("token");
-    navigation.replace("LoginScreen");
+    const confirmed = await showConfirm("Confirmar Logout", "Tem certeza que deseja sair da sua conta?");
+    
+    if (confirmed) {
+      await AsyncStorage.removeItem("token");
+      showAlert("Sucesso", "Logout realizado com sucesso!", "Sucesso");
+      navigation.replace("LoginScreen");
+    }
   };
 
-  const handleDeleteAccount = () => {
+  const handleDeleteAccount = async () => {
     if (!user?.id) {
-      Alert.alert("Erro", "Dados do usuário não encontrados");
+      showAlert("Erro", "Dados do usuário não encontrados", "Erro");
       return;
     }
     
-    Alert.alert(
-      "Excluir Conta",
-      "Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.",
-      [
-        { text: "Cancelar", style: "cancel" },
-        { 
-          text: "Excluir", 
-          style: "destructive",
-          onPress: async () => {
-            try {
-              console.log("Excluindo usuário ID:", user.id);
-              console.log("URL da requisição:", `/users/${user.id}`);
-              const response = await api.delete(`/users/${user.id}`);
-              console.log("Resposta da exclusão:", response.data);
-              await AsyncStorage.removeItem("token");
-              Alert.alert("Sucesso", "Conta excluída com sucesso!", [
-                { text: "OK", onPress: () => navigation.replace("LoginScreen") }
-              ]);
-            } catch (error) {
-              console.log("Erro completo:", error);
-              console.log("Status do erro:", error.response?.status);
-              console.log("Dados do erro:", error.response?.data);
-              Alert.alert("Erro", `Erro ${error.response?.status}: ${error.response?.data?.message || error.message}`);
-            }
-          }
-        }
-      ]
-    );
+    const confirmed = await showConfirm("Excluir Conta", "Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.");
+    
+    if (confirmed) {
+      try {
+        console.log("Excluindo usuário ID:", user.id);
+        const response = await api.delete(`/users/${user.id}`);
+        console.log("Resposta da exclusão:", response.data);
+        await AsyncStorage.removeItem("token");
+        showAlert("Sucesso", "Conta excluída com sucesso!", "Sucesso");
+        navigation.replace("LoginScreen");
+      } catch (error) {
+        console.log("Erro ao excluir:", error);
+        showAlert("Erro", error.response?.data?.message || "Não foi possível excluir a conta", "Erro");
+      }
+    }
   };
 
   if (loading) {

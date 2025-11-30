@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../services/api";
+import showAlert from "../utils/alert";
 
 export default function EditProfileScreen({ navigation }) {
   const [user, setUser] = useState({});
@@ -14,7 +15,7 @@ export default function EditProfileScreen({ navigation }) {
         const response = await api.get("/auth/me");
         setUser(response.data);
       } catch (error) {
-        Alert.alert("Erro", "Não foi possível carregar os dados");
+        showAlert("Erro", "Não foi possível carregar os dados", "Erro");
       } finally {
         setLoading(false);
       }
@@ -24,7 +25,7 @@ export default function EditProfileScreen({ navigation }) {
 
   const handleSave = async () => {
     if (!user.nome || !user.cep || !user.endereco) {
-      Alert.alert("Erro", "Preencha todos os campos obrigatórios");
+      showAlert("Erro", "Preencha todos os campos obrigatórios", "Erro");
       return;
     }
 
@@ -47,10 +48,11 @@ export default function EditProfileScreen({ navigation }) {
       });
       
       console.log("Resposta da API:", response.data);
+      showAlert("Sucesso", "Perfil atualizado com sucesso!", "Sucesso");
       navigation.goBack();
     } catch (error) {
       console.log("Erro ao salvar:", error.response?.data || error.message);
-      Alert.alert("Erro", error.response?.data?.message || "Não foi possível atualizar o perfil");
+      showAlert("Erro", error.response?.data?.message || "Não foi possível atualizar o perfil", "Erro");
     } finally {
       setSaving(false);
     }

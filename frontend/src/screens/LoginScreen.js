@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { View, TextInput, Button, Text, StyleSheet, Alert } from "react-native";
+import { View, TextInput, Button, Text, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../services/api";
+import showAlert from "../utils/alert";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -24,9 +25,10 @@ export default function LoginScreen({ navigation }) {
     if (!senha || senha.length < 6) errors.push("Senha (mínimo 6 caracteres)");
     
     if (errors.length > 0) {
-      Alert.alert(
+      showAlert(
         "Campos obrigatórios não preenchidos", 
-        "Preencha os seguintes campos:\n\n• " + errors.join("\n• ")
+        "Preencha os seguintes campos:\n\n• " + errors.join("\n• "),
+        "Erro"
       );
       return;
     }
@@ -47,7 +49,7 @@ export default function LoginScreen({ navigation }) {
       // Navega para tela principal (replace impede voltar)
       navigation.replace("UBSScreen");
     } catch (error) {
-      Alert.alert("Erro", "Email ou senha inválidos");
+      showAlert("Erro", "Email ou senha inválidos", "Erro");
     } finally {
       setLoading(false);
     }

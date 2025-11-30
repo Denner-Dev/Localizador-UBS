@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { View, TextInput, Button, Text, StyleSheet, Alert } from "react-native";
+import { View, TextInput, Button, Text, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../services/api";
+import showAlert from "../utils/alert";
 
 export default function RegisterScreen({ navigation }) {
   const [nome, setNome] = useState("");
@@ -62,9 +63,10 @@ export default function RegisterScreen({ navigation }) {
     
     // Verifica se há erros de validação
     if (validationErrors.length > 0) {
-      Alert.alert(
+      showAlert(
         "Campos obrigatórios não preenchidos", 
-        "Preencha os seguintes campos:\n\n• " + validationErrors.join("\n• ")
+        "Preencha os seguintes campos:\n\n• " + validationErrors.join("\n• "),
+        "Erro"
       );
       return;
     }
@@ -82,14 +84,14 @@ export default function RegisterScreen({ navigation }) {
         longitude: parseFloat(longitude), // Converte para número
       });
 
-      Alert.alert("Sucesso", "Cadastro realizado! Faça login.");
+      await showAlert("Sucesso", "Cadastro realizado! Faça login.", "Sucesso");
       navigation.navigate("LoginScreen");
     } catch (error) {
       // Trata erros de validação do backend
       const errorMessage = error.response?.data?.errors 
         ? "Erros encontrados:\n\n• " + error.response.data.errors.join("\n• ")
         : error.response?.data?.message || "Não foi possível cadastrar";
-      Alert.alert("Erro", errorMessage);
+      showAlert("Erro", errorMessage, "Erro");
     } finally {
       setLoading(false);
     }

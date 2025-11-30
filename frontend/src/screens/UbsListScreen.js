@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, Alert, ActivityIndicator, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../services/api";
 import * as Location from "expo-location";
+import showAlert, { showConfirm } from "../utils/alert";
 
 export default function UbsListScreen({ navigation }) {
   const [ubs, setUbs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem("token");
-    navigation.replace("LoginScreen");
+    const confirmed = await showConfirm("Confirmar Logout", "Tem certeza que deseja sair da sua conta?");
+    
+    if (confirmed) {
+      await AsyncStorage.removeItem("token");
+      showAlert("Sucesso", "Logout realizado com sucesso!", "Sucesso");
+      navigation.replace("LoginScreen");
+    }
   };
 
   useEffect(() => {
@@ -19,7 +25,7 @@ export default function UbsListScreen({ navigation }) {
         // Verificar autenticação
         const token = await AsyncStorage.getItem("token");
         if (!token) {
-          Alert.alert("Erro", "Token não encontrado. Faça login novamente");
+          showAlert("Erro", "Token não encontrado. Faça login novamente", "Erro");
           setLoading(false);
           return;
         }
@@ -37,7 +43,7 @@ export default function UbsListScreen({ navigation }) {
         setUbs(res.data);
       } catch (error) {
         console.log("Erro ao buscar UBS:", error.response?.data || error.message);
-        Alert.alert("Erro", error.response?.data?.message || "Não foi possível buscar as UBSs próximas");
+        showAlert("Erro", error.response?.data?.message || "Não foi possível buscar as UBSs próximas", "Erro");
       } finally {
         setLoading(false);
       }
