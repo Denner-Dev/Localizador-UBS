@@ -3,11 +3,44 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Activi
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../services/api";
 import showAlert from "../utils/alert";
+import * as Location from "expo-location";
 
 export default function EditProfileScreen({ navigation }) {
   const [user, setUser] = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [locationLoading, setLocationLoading] = useState(false);
+
+  const getCurrentLocation = async () => {
+    setLocationLoading(true);
+    try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      
+      if (status !== 'granted') {
+        showAlert("Permissão Negada", "Para obter sua localização, é necessário permitir o acesso à localização nas configurações do seu dispositivo.", "Erro");
+        setLocationLoading(false);
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+        timeout: 15000,
+        maximumAge: 10000
+      });
+      
+      setUser({
+        ...user,
+        latitude: parseFloat(location.coords.latitude.toFixed(6)),
+        longitude: parseFloat(location.coords.longitude.toFixed(6))
+      });
+      showAlert("Sucesso", "Localização obtida com sucesso!", "Sucesso");
+    } catch (error) {
+      console.log("Erro de localização:", error);
+      showAlert("Erro", "Não foi possível obter a localização. Verifique se o GPS está ativado.", "Erro");
+    } finally {
+      setLocationLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -93,23 +126,32 @@ export default function EditProfileScreen({ navigation }) {
           placeholder="Rua, número, bairro"
         />
 
-        <Text style={styles.label}>Latitude</Text>
-        <TextInput
-          style={styles.input}
-          value={user.latitude?.toString()}
-          onChangeText={(text) => setUser({...user, latitude: parseFloat(text)})}
-          placeholder="-23.55052"
-          keyboardType="numeric"
-        />
-
-        <Text style={styles.label}>Longitude</Text>
-        <TextInput
-          style={styles.input}
-          value={user.longitude?.toString()}
-          onChangeText={(text) => setUser({...user, longitude: parseFloat(text)})}
-          placeholder="-46.63331"
-          keyboardType="numeric"
-        />
+        <Text style={styles.label}>Localização</Text>
+        <View style={styles.locationContainer}>
+          <TextInput
+            style={[styles.input, styles.locationInput]}
+            value={user.latitude?.toString()}
+            onChangeText={(text) => setUser({...user, latitude: parseFloat(text)})}
+            placeholder="Latitude"
+            keyboardType="numeric"
+          />
+          <TextInput
+            style={[styles.input, styles.locationInput]}
+            value={user.longitude?.toString()}
+            onChangeText={(text) => setUser({...user, longitude: parseFloat(text)})}
+            placeholder="Longitude"
+            keyboardType="numeric"
+          />
+        </View>
+        <TouchableOpacity 
+          style={styles.locationButton} 
+          onPress={getCurrentLocation}
+          disabled={locationLoading}
+        >
+          <Text style={styles.locationButtonText}>
+            {locationLoading ? "Obtendo localização..." : "📍 Obter Minha Localização"}
+          </Text>
+        </TouchableOpacity>
 
         <TouchableOpacity 
           style={[styles.saveButton, saving && styles.disabled]} 
@@ -167,5 +209,32 @@ const styles = StyleSheet.create({
   },
   disabled: {
     opacity: 0.6,
+  },
+  locationContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 0
+  },
+  locationInput: {
+    flex: 1,
+    marginHorizontal: 5
+  },
+  locationButton: {
+    backgroundColor: "#27ae60",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 8,
+    marginBottom: 16,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84
+  },
+  locationButtonText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "600"
   },
 });

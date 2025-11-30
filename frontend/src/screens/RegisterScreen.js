@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { View, TextInput, Button, Text, StyleSheet } from "react-native";
+import { View, TextInput, Button, Text, StyleSheet, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../services/api";
 import showAlert from "../utils/alert";
+import * as Location from "expo-location";
 
 export default function RegisterScreen({ navigation }) {
   const [nome, setNome] = useState("");
@@ -13,6 +14,35 @@ export default function RegisterScreen({ navigation }) {
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
   const [loading, setLoading] = useState(false);
+  const [locationLoading, setLocationLoading] = useState(false);
+
+  const getCurrentLocation = async () => {
+    setLocationLoading(true);
+    try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      
+      if (status !== 'granted') {
+        showAlert("Permissão Negada", "Para obter sua localização, é necessário permitir o acesso à localização nas configurações do seu dispositivo.", "Erro");
+        setLocationLoading(false);
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+        timeout: 15000,
+        maximumAge: 10000
+      });
+      
+      setLatitude(location.coords.latitude.toFixed(6));
+      setLongitude(location.coords.longitude.toFixed(6));
+      showAlert("Sucesso", "Localização obtida com sucesso!", "Sucesso");
+    } catch (error) {
+      console.log("Erro de localização:", error);
+      showAlert("Erro", "Não foi possível obter a localização. Verifique se o GPS está ativado.", "Erro");
+    } finally {
+      setLocationLoading(false);
+    }
+  };
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -136,20 +166,31 @@ export default function RegisterScreen({ navigation }) {
         onChangeText={setEndereco} 
         style={styles.input} 
       />
-      <TextInput 
-        placeholder="Latitude *" 
-        value={latitude} 
-        onChangeText={setLatitude} 
-        style={styles.input} 
-        keyboardType="numeric" 
-      />
-      <TextInput 
-        placeholder="Longitude *" 
-        value={longitude} 
-        onChangeText={setLongitude} 
-        style={styles.input} 
-        keyboardType="numeric" 
-      />
+      <View style={styles.locationContainer}>
+        <TextInput 
+          placeholder="Latitude *" 
+          value={latitude} 
+          onChangeText={setLatitude} 
+          style={[styles.input, styles.locationInput]} 
+          keyboardType="numeric" 
+        />
+        <TextInput 
+          placeholder="Longitude *" 
+          value={longitude} 
+          onChangeText={setLongitude} 
+          style={[styles.input, styles.locationInput]} 
+          keyboardType="numeric" 
+        />
+      </View>
+      <TouchableOpacity 
+        style={styles.locationButton} 
+        onPress={getCurrentLocation}
+        disabled={locationLoading}
+      >
+        <Text style={styles.locationButtonText}>
+          {locationLoading ? "Obtendo localização..." : "📍 Obter Minha Localização"}
+        </Text>
+      </TouchableOpacity>
       <Button title={loading ? "Carregando..." : "Cadastrar"} onPress={handleRegister} disabled={loading} />
     </View>
   );
@@ -177,5 +218,30 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "white",
     fontSize: 16
+  },
+  locationContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between"
+  },
+  locationInput: {
+    flex: 1,
+    marginHorizontal: 5
+  },
+  locationButton: {
+    backgroundColor: "#27ae60",
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    marginBottom: 15,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84
+  },
+  locationButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600"
   },
 });
