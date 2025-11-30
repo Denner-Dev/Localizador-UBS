@@ -5,6 +5,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import UbsListScreen from './src/screens/UbsListScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
+import EditProfileScreen from './src/screens/EditProfileScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -36,6 +38,16 @@ function App() {
             title: '🏥 UBS Próximas',
             headerLeft: null // Remove botão voltar
           }} 
+        />
+        <Stack.Screen 
+          name="ProfileScreen" 
+          component={ProfileScreen} 
+          options={{ title: '👤 Meu Perfil' }} 
+        />
+        <Stack.Screen 
+          name="EditProfileScreen" 
+          component={EditProfileScreen} 
+          options={{ title: '✏️ Editar Perfil' }} 
         />
       </Stack.Navigator>
     </NavigationContainer>

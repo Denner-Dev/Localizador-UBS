@@ -25,8 +25,8 @@ namespace Api.Controllers
             if (!ModelState.IsValid)
             {
                 var errors = ModelState
-                    .Where(x => x.Value.Errors.Count > 0)
-                    .Select(x => x.Value.Errors.First().ErrorMessage)
+                    .Where(x => x.Value?.Errors.Count > 0)
+                    .Select(x => x.Value?.Errors.FirstOrDefault()?.ErrorMessage ?? "Erro de validação")
                     .ToList();
                 
                 return BadRequest(new { message = "Campos obrigatórios:", errors });
@@ -84,6 +84,8 @@ namespace Api.Controllers
                     id = user.Id,
                     nome = user.Nome,
                     email = user.Email,
+                    cep = user.Cep,
+                    endereco = user.Endereco,
                     latitude = user.Latitude,
                     longitude = user.Longitude
                 });

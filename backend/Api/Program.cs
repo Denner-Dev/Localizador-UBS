@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,8 +64,9 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<UbsService>();
 
-// JWT (.NET 9 syntax)
-var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
+// JWT (.NET 9 syntax) - Chave fixa para desenvolvimento
+var jwtKey = builder.Configuration["Jwt:Key"] ?? Environment.GetEnvironmentVariable("JWT_KEY") ?? "ChaveFixaParaDesenvolvimento123456789012345678901234567890";
+var key = Encoding.UTF8.GetBytes(jwtKey);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

@@ -13,12 +13,12 @@ namespace Api.Repositories
             _context = context;
         }
 
-        public async Task<User> GetByEmail(string email)
+        public async Task<User?> GetByEmail(string email)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
         }
 
-        public async Task<User> GetById(int id)
+        public async Task<User?> GetById(int id)
         {
             return await _context.Users.FindAsync(id);
         }

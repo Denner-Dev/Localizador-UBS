@@ -24,15 +24,20 @@ export default function UbsListScreen({ navigation }) {
           return;
         }
         
+        console.log("Buscando dados do usuário...");
         // Buscar coordenadas do usuário logado
         const userResponse = await api.get("/auth/me");
         const { latitude, longitude } = userResponse.data;
+        console.log("Coordenadas do usuário:", latitude, longitude);
         
         // Buscar UBS ordenadas por proximidade
+        console.log("Buscando UBS próximas...");
         const res = await api.get(`/ubs/perto?lat=${latitude}&lng=${longitude}`);
+        console.log("UBS encontradas:", res.data.length);
         setUbs(res.data);
       } catch (error) {
-        Alert.alert("Erro", "Não foi possível buscar as UBSs próximas");
+        console.log("Erro ao buscar UBS:", error.response?.data || error.message);
+        Alert.alert("Erro", error.response?.data?.message || "Não foi possível buscar as UBSs próximas");
       } finally {
         setLoading(false);
       }
@@ -53,6 +58,12 @@ export default function UbsListScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.profileButton} 
+          onPress={() => navigation.navigate("ProfileScreen")}
+        >
+          <Text style={styles.profileIcon}>👤</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutText}>Sair</Text>
         </TouchableOpacity>
@@ -86,12 +97,24 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: "row",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
     alignItems: "center",
     padding: 20,
     backgroundColor: "white",
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
+  },
+  profileButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#3498db",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  profileIcon: {
+    fontSize: 20,
+    color: "white",
   },
   center: {
     flex: 1,

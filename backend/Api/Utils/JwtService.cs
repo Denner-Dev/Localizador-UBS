@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Api.Models;
+using System.Linq;
 
 namespace Api.Utils
 {
@@ -20,7 +21,8 @@ namespace Api.Utils
         public string GenerateToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]);
+            var jwtKey = _config["Jwt:Key"] ?? Environment.GetEnvironmentVariable("JWT_KEY") ?? "ChaveFixaParaDesenvolvimento123456789012345678901234567890";
+            var key = Encoding.UTF8.GetBytes(jwtKey);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -46,7 +48,8 @@ namespace Api.Utils
         public ClaimsPrincipal? ValidateToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]);
+            var jwtKey = _config["Jwt:Key"] ?? Environment.GetEnvironmentVariable("JWT_KEY") ?? "ChaveFixaParaDesenvolvimento123456789012345678901234567890";
+            var key = Encoding.UTF8.GetBytes(jwtKey);
 
             try
             {
@@ -68,5 +71,7 @@ namespace Api.Utils
                 return null;
             }
         }
+
+
     }
 }

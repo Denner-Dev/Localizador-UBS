@@ -13,17 +13,45 @@ export default function RegisterScreen({ navigation }) {
   const [longitude, setLongitude] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validateCEP = (cep) => {
+    const cepRegex = /^\d{5}-?\d{3}$/;
+    return cepRegex.test(cep);
+  };
+
+  const validateCoordinate = (coord, type) => {
+    const num = parseFloat(coord);
+    if (isNaN(num)) return false;
+    if (type === 'lat') return num >= -90 && num <= 90;
+    if (type === 'lng') return num >= -180 && num <= 180;
+    return false;
+  };
+
   // Validação de campos obrigatórios e limites
   const validateFields = () => {
     const errors = [];
     
     if (!nome || nome.length < 2) errors.push("Nome completo (mínimo 2 caracteres)");
-    if (!email || email.length > 50) errors.push("E-mail (máximo 50 caracteres)");
+    if (!email) errors.push("E-mail");
+    else if (!validateEmail(email)) errors.push("E-mail válido");
+    else if (email.length > 50) errors.push("E-mail (máximo 50 caracteres)");
+    
     if (!senha || senha.length < 6 || senha.length > 100) errors.push("Senha (entre 6 e 100 caracteres)");
+    
     if (!cep) errors.push("CEP");
+    else if (!validateCEP(cep)) errors.push("CEP válido (00000-000)");
+    
     if (!endereco) errors.push("Endereço");
+    
     if (!latitude) errors.push("Latitude");
+    else if (!validateCoordinate(latitude, 'lat')) errors.push("Latitude válida (-90 a 90)");
+    
     if (!longitude) errors.push("Longitude");
+    else if (!validateCoordinate(longitude, 'lng')) errors.push("Longitude válida (-180 a 180)");
     
     return errors;
   };

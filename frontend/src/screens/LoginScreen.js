@@ -8,12 +8,19 @@ export default function LoginScreen({ navigation }) {
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   // Função para processar o login do usuário
   const handleLogin = async () => {
     const errors = [];
     
     // Validação de campos obrigatórios
     if (!email) errors.push("Email");
+    else if (!validateEmail(email)) errors.push("Email válido");
+    
     if (!senha || senha.length < 6) errors.push("Senha (mínimo 6 caracteres)");
     
     if (errors.length > 0) {
@@ -30,6 +37,10 @@ export default function LoginScreen({ navigation }) {
       const response = await api.post("/auth/login", { email, senha });
       const token = response.data.token;
 
+      // Salva email para autenticação
+      await AsyncStorage.setItem("email", email);
+      // Salva o id do usuário para uso futuro
+      //await AsyncStorage.setItem("userId", response.data.userId.toString());
       // Salva token JWT para autenticação
       await AsyncStorage.setItem("token", token);
 

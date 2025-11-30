@@ -9,6 +9,8 @@ Este é um aplicativo mobile que permite:
 - **Fazer login** de forma segura com validações
 - **Ver lista de 50 UBS reais** de São Paulo ordenadas por proximidade
 - **Calcular distância** das UBS até sua localização
+- **Gerenciar perfil** - visualizar, editar e excluir conta
+- **CRUD completo** de usuários
 - **Sair do aplicativo** com segurança
 
 ## 🛠️ GUIA COMPLETO DE INSTALAÇÃO (Passo a Passo)
@@ -145,10 +147,14 @@ npm --version
 2. **Clique em "Entrar"**
 3. **Você verá a lista de UBS próximas**
 
-### 3. Vendo as UBS:
+### 3. Usando o aplicativo:
 - Aparecerá uma lista com **50 UBS reais** de São Paulo
 - Ordenadas por **distância da sua localização**
 - Cada uma mostra: nome, endereço completo e distância em km
+- **Clique no ícone de perfil (👤)** no canto superior esquerdo para:
+  - Ver seus dados pessoais
+  - Editar seu perfil
+  - Excluir sua conta
 - Para sair, clique no botão **"Sair"** no canto superior direito
 
 ---
@@ -209,7 +215,9 @@ projeto_fullstack/
 
 1. **🔐 Login** - Email e senha com validações obrigatórias
 2. **📝 Cadastro** - Registro completo com localização
-3. **🏥 UBS** - Lista de 50 UBS reais ordenadas por distância da sua casa
+3. **🏥 UBS** - Lista de 50 UBS reais ordenadas por distância
+4. **👤 Perfil** - Visualizar dados pessoais
+5. **✏️ Editar Perfil** - Atualizar informações pessoais
 
 ## 🔒 Segurança
 

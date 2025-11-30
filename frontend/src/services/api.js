@@ -12,6 +12,7 @@ const getBaseURL = () => {
 
 const api = axios.create({
   baseURL: getBaseURL(),
+  timeout: 10000, // 10 segundos
 });
 
 api.interceptors.request.use(async (config) => {
@@ -21,5 +22,18 @@ api.interceptors.request.use(async (config) => {
   }
   return config;
 });
+
+// Interceptor para tratamento de erros
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.code === 'ECONNABORTED') {
+      error.message = 'Tempo limite de conexão excedido';
+    } else if (!error.response) {
+      error.message = 'Erro de rede. Verifique sua conexão';
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default api;

@@ -35,7 +35,7 @@ namespace Api.Services
                 SenhaHash = hash,
                 Cep = dto.Cep ?? "",
                 Endereco = dto.Endereco ?? "",
-                Latitude = dto.Latitude, 
+                Latitude = dto.Latitude,
                 Longitude = dto.Longitude
             };
 
@@ -44,7 +44,7 @@ namespace Api.Services
         }
 
         /// Autentica usuário e gera token JWT
-        public async Task<string> Login(LoginDto dto)
+        public async Task<string?> Login(LoginDto dto)
         {
             var user = await _repo.GetByEmail(dto.Email);
             if (user == null) return null;
@@ -59,9 +59,40 @@ namespace Api.Services
 
 
         /// Busca usuário por email (usado para obter coordenadas)
-        public async Task<User> GetUserByEmail(string email)
+        public async Task<User?> GetUserByEmail(string email)
         {
             return await _repo.GetByEmail(email);
+        }
+
+        ///Lista todos os usuários
+        public async Task<List<User>> GetAll()
+        {
+            return await _repo.GetAll();
+        }
+        /// Atualiza os dados do usuário
+        public async Task<User?> Update(int id, UserUpdateDto dto)
+        {
+            var user = await _repo.GetById(id);
+            if (user == null) return null;
+
+            // Atualiza os dados do usuário
+            user.Nome = dto.Nome;
+            user.Cep = dto.Cep;
+            user.Endereco = dto.Endereco;
+            user.Latitude = dto.Latitude;
+            user.Longitude = dto.Longitude;
+
+            await _repo.Update(user);
+            return user;
+        }
+        /// Deleta usuário
+        public async Task<bool> Delete(int id)
+        {
+            var user = await _repo.GetById(id);
+            if (user == null) return false;
+
+            await _repo.Delete(user);
+            return true;
         }
     }
 }
